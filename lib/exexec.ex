@@ -162,18 +162,27 @@ defmodule Exexec do
   defdelegate signal(signal), to: :exec
 
   @doc """
-  Start `Exexec` with `options`.
+  Start `Exexec`.
   """
   @spec start() :: {:ok, pid} | {:error, any}
-  @spec start(exec_options) :: {:ok, pid} | {:error, any}
   defdelegate start(), to: :exec
+
+  @doc """
+  Start `Exexec` with `options`.
+  """
+  @spec start(exec_options) :: {:ok, pid} | {:error, any}
   defdelegate start(options), to: :exec
+
+  @doc """
+  Start `Exexec` and link to calling process.
+  """
+  @spec start_link :: {:ok, pid} | {:error, any}
+  def start_link(), do: start_link([])
 
   @doc """
   Start `Exexec` with `options` and link to calling process.
   """
   @spec start_link(exec_options) :: {:ok, pid} | {:error, any}
-  def start_link(), do: start_link([])
   defdelegate start_link(options), to: :exec
 
   @doc """
@@ -204,8 +213,7 @@ defmodule Exexec do
   """
   @spec stop_and_wait(pid | os_pid | port) :: :ok | {:error, any}
   @spec stop_and_wait(pid | os_pid | port, integer) :: :ok | {:error, any}
-  def stop_and_wait(pid), do: stop_and_wait(pid, 5_000)
-  defdelegate stop_and_wait(pid, integer), to: :exec
+  def stop_and_wait(pid, timeout \\ 5_000), do: :exec.stop_and_wait(pid, timeout)
 
   @doc """
   Return a list of OS pids managed by `Exexec`.

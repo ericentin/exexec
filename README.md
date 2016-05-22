@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/antipax/exexec.svg?branch=master)](https://travis-ci.org/antipax/exexec) [![Coverage Status](https://coveralls.io/repos/github/antipax/exexec/badge.svg?branch=master)](https://coveralls.io/github/antipax/exexec?branch=master) [![Inline docs](http://inch-ci.org/github/antipax/exexec.svg?branch=master)](http://inch-ci.org/github/antipax/exexec) [![Hex.pm package version](https://img.shields.io/hexpm/v/tqdm.svg)](https://hex.pm/packages/tqdm) [![Hex.pm package license](https://img.shields.io/hexpm/l/tqdm.svg)](https://github.com/antipax/exexec/blob/master/LICENSE)
+
 # Exexec
 
 Execute and control OS processes from Elixir.
@@ -14,8 +16,8 @@ interface as well as some nice Elixir-y goodies on top.
           [{:exexec, "~> 1.0.0"}]
         end
 
-  2. Ensure exexec is started before your application:
+  2. Ensure exexec and erlexec are started before your application:
 
         def application do
-          [applications: [:exexec]]
+          [applications: [:erlexec, :exexec]]
         end
