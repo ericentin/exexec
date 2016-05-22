@@ -21,3 +21,8 @@ cache:
     - .dialyxir
     - _build
     - deps
+addons:
+  apt:
+    packages:
+    - build-essential
+    - libcap-dev
