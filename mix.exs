@@ -33,7 +33,7 @@ defmodule Exexec.Mixfile do
 
   defp deps do
     [
-      {:erlexec, "~> 1.1.2"},
+      {:erlexec, "~> 1.1.3"},
       {:dialyxir, "~> 0.3", only: [:dev, :test]},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev},
