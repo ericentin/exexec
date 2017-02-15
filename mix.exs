@@ -14,6 +14,7 @@ defmodule Exexec.Mixfile do
       description: description(),
       package: package(),
       dialyzer: [
+        plt_add_deps: :project,
         plt_add_apps: [:erlexec],
       ],
       source_url: "https://github.com/antipax/exexec",
