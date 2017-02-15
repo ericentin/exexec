@@ -19,7 +19,6 @@ after_script:
   - MIX_ENV=docs mix inch.report
 cache:
   directories:
-    - .dialyxir
     - _build
     - deps
 addons:
