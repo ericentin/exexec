@@ -21,7 +21,6 @@ cache:
   directories:
     - _build
     - deps
-    - $HOME/.mix
 addons:
   apt:
     packages:
