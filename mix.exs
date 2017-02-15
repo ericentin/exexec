@@ -7,15 +7,15 @@ defmodule Exexec.Mixfile do
     [
       app: :exexec,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps,
-      description: description,
-      package: package,
+      deps: deps(),
+      description: description(),
+      package: package(),
       dialyzer: [
         plt_add_apps: [:erlexec],
-        plt_file: ".dialyxir/.local.plt"],
+      ],
       source_url: "https://github.com/antipax/exexec",
       docs: [
         main: "Exexec",
@@ -37,7 +37,7 @@ defmodule Exexec.Mixfile do
       {:dialyxir, "~> 0.3", only: [:dev, :test]},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev},
-      {:excoveralls, "~> 0.4", only: :test},
+      {:excoveralls, "~> 0.6.2", only: :test},
       {:inch_ex, ">= 0.0.0", only: :docs}
     ]
   end
