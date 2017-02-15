@@ -1,6 +1,7 @@
 language: elixir
 elixir:
-  - 1.2.5
+  - 1.3.4
+dist: trusty
 otp_release:
   - 18.3
 sudo: false
@@ -24,5 +25,4 @@ cache:
 addons:
   apt:
     packages:
-    - build-essential
     - libcap-dev
