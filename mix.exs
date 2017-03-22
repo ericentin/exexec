@@ -7,7 +7,7 @@ defmodule Exexec.Mixfile do
     [
       app: :exexec,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps(),
