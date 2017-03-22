@@ -13,7 +13,7 @@ interface as well as some nice Elixir-y goodies on top.
   1. Add exexec to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:exexec, "~> 0.0.1"}]
+          [{:exexec, "~> 0.1"}]
         end
 
   2. Ensure exexec and erlexec are started before your application:
