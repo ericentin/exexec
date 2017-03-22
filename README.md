@@ -5,7 +5,7 @@
 Execute and control OS processes from Elixir.
 
 An idiomatic Elixir wrapper for Serge Aleynikov's excellent
-[erlexec](https://github.com/saleyn/erlexec), Exexec, provides an Elixir
+[erlexec](https://github.com/saleyn/erlexec), Exexec provides an Elixir
 interface as well as some nice Elixir-y goodies on top.
 
 ## Installation
