@@ -146,7 +146,7 @@ defmodule Exexec do
 
   `pid` can be an `Exexec` pid or an OS pid.
   """
-  @spec send(pid | os_pid, binary) :: :ok
+  @spec send(pid | os_pid, binary | :eof) :: :ok
   defdelegate send(pid, data), to: :exec
 
   @doc """
