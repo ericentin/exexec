@@ -2,11 +2,11 @@ defmodule Exexec.ToErl do
   @moduledoc false
 
   def command_to_erl(command) when is_list(command) do
-    Enum.map(command, &to_char_list/1)
+    Enum.map(command, &to_charlist/1)
   end
 
   def command_to_erl(command) do
-    to_char_list(command)
+    to_charlist(command)
   end
 
   def command_options_to_erl(options) do
@@ -27,7 +27,7 @@ defmodule Exexec.ToErl do
     string_option =
       if string_option == :kill_command, do: :kill, else: string_option
 
-    {string_option, to_char_list(value)}
+    {string_option, to_charlist(value)}
   end
 
   @integer_options [:kill_timeout, :success_exit_code, :nice]
@@ -46,7 +46,7 @@ defmodule Exexec.ToErl do
     if value do
       case value do
         true -> :stdin
-        string when is_binary(string) -> {:stdin, to_char_list(string)}
+        string when is_binary(string) -> {:stdin, to_charlist(string)}
         other -> {:stdin, other}
       end
     end
@@ -64,7 +64,7 @@ defmodule Exexec.ToErl do
         {output_device_option, other_option}
 
       {filename, output_file_options} ->
-        filename = to_char_list(filename)
+        filename = to_charlist(filename)
         output_file_options = output_file_options_to_erl(output_file_options)
         {output_device_option, filename, output_file_options}
 
@@ -76,7 +76,7 @@ defmodule Exexec.ToErl do
   def output_device_option_to_erl(:null), do: :null
   def output_device_option_to_erl(:close), do: :close
   def output_device_option_to_erl(:print), do: :print
-  def output_device_option_to_erl(path) when is_binary(path), do: to_char_list(path)
+  def output_device_option_to_erl(path) when is_binary(path), do: to_charlist(path)
   def output_device_option_to_erl(pid) when is_pid(pid), do: pid
   def output_device_option_to_erl(fun) when is_function(fun, 3), do: fun
 
@@ -119,13 +119,13 @@ defmodule Exexec.ToErl do
   when string_option in @output_device_string_options do
     string_option =
       if string_option == :port_path, do: :portexe, else: string_option
-    {string_option, to_char_list(value)}
+    {string_option, to_charlist(value)}
   end
 
   @output_device_string_list_options [:args, :limit_users]
   def exec_option_to_erl(string_list_option, value)
   when string_list_option in @output_device_string_list_options do
-    {string_list_option, Enum.map(value, &to_char_list/1)}
+    {string_list_option, Enum.map(value, &to_charlist/1)}
   end
 
   def exec_option_to_erl(:env, value) do
@@ -133,5 +133,5 @@ defmodule Exexec.ToErl do
   end
 
   def to_env(value),
-    do: for {key, value} <- value, do: {to_char_list(key), to_char_list(value)}
+    do: for {key, value} <- value, do: {to_charlist(key), to_charlist(value)}
 end
