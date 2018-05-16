@@ -60,6 +60,7 @@ defmodule Exexec.ToErl do
     case value do
       true -> output_device_option
       false -> nil
+      :stream -> {output_device_option, :stream}
       ^other_option ->
         {output_device_option, other_option}
 

@@ -31,6 +31,7 @@ defmodule Exexec do
     Path.t |
     {Path.t, output_file_options} |
     pid |
+    :stream |
     (output_device, os_pid, binary -> any)
 
   @type command_option ::
@@ -69,6 +70,7 @@ defmodule Exexec do
 
   @type on_run ::
     {:ok, pid, os_pid} |
+    {:ok, pid, os_pid, [{:stream, Enumerable.t, pid}]} |
     {:ok, [{output_device, [binary]}]} |
     {:error, any}
 
@@ -121,10 +123,7 @@ defmodule Exexec do
   @spec run(command) :: on_run
   @spec run(command, command_options) :: on_run
   def run(command, options \\ []) do
-    command = command_to_erl(command)
-    options = command_options_to_erl(options)
-
-    :exec.run(command, options)
+    prepare_run_exec(:run, command, options)
   end
 
   @doc """
@@ -135,19 +134,49 @@ defmodule Exexec do
   @spec run_link(command) :: on_run
   @spec run_link(command, command_options) :: on_run
   def run_link(command, options \\ []) do
-    command = command_to_erl(command)
-    options = command_options_to_erl(options)
+    prepare_run_exec(:run_link, command, options)
+  end
 
+  defp handle_extras([{:stdout, :stream}]) do
+    {:ok, stream, server} = Exexec.StreamOutput.create_line_stream()
+    {:ok, [{:stdout, server}], [{:stream, stream, server}]}
+  end
+  defp handle_extras(_) do
+    {:ok, [], []}
+  end
+
+  defp prepare_run_exec(type, command, options) do
+    with :ok <- Exexec.Extras.validate(options) do
+      command = command_to_erl(command)
+      {extras, options} = Exexec.Extras.split(options)
+      {:ok,  additional_options, stream} = handle_extras(extras)
+      options = command_options_to_erl(options)
+      case {run_exec(type, command, options ++ additional_options), stream} do
+        {result, []} -> result
+        {{:ok, pid, os_pid}, [{:stream, stream, server_pid}]} ->
+          send(server_pid, {:monitor, pid})
+          {:ok, pid, os_pid, [{:stream, stream, server_pid}]}
+      end
+    else
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  defp run_exec(:run, command, options) do
+    :exec.run(command, options)
+  end
+  defp run_exec(:run_link, command, options) do
     :exec.run_link(command, options)
   end
 
-  @doc """
-  Send `data` to the stdin of `pid`.
+  # @doc """
+  # Send `data` to the stdin of `pid`.
 
-  `pid` can be an `Exexec` pid or an OS pid.
-  """
-  @spec send(pid | os_pid, binary | :eof) :: :ok
-  defdelegate send(pid, data), to: :exec
+  # `pid` can be an `Exexec` pid or an OS pid.
+  # """
+  # @spec send(pid | os_pid, binary | :eof) :: :ok
+  # defdelegate send(pid, data), to: :exec
 
   @doc """
   Change group ID of `os_pid` to `gid`.
