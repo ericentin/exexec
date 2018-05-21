@@ -8,6 +8,7 @@ defmodule Exexec do
   """
 
   import Exexec.ToErl
+  import Kernel, except: [send: 2]
 
   @type command :: String.t | [Path.t | [String.t]]
 
@@ -154,7 +155,7 @@ defmodule Exexec do
       case {run_exec(type, command, options ++ additional_options), stream} do
         {result, []} -> result
         {{:ok, pid, os_pid}, [{:stream, stream, server_pid}]} ->
-          send(server_pid, {:monitor, pid})
+          Kernel.send(server_pid, {:monitor, pid})
           {:ok, pid, os_pid, [{:stream, stream, server_pid}]}
       end
     else
@@ -170,13 +171,13 @@ defmodule Exexec do
     :exec.run_link(command, options)
   end
 
-  # @doc """
-  # Send `data` to the stdin of `pid`.
+  @doc """
+  Send `data` to the stdin of `pid`.
 
-  # `pid` can be an `Exexec` pid or an OS pid.
-  # """
-  # @spec send(pid | os_pid, binary | :eof) :: :ok
-  # defdelegate send(pid, data), to: :exec
+  `pid` can be an `Exexec` pid or an OS pid.
+  """
+  @spec send(pid | os_pid, binary | :eof) :: :ok
+  defdelegate send(pid, data), to: :exec
 
   @doc """
   Change group ID of `os_pid` to `gid`.
