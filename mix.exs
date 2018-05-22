@@ -36,6 +36,7 @@ defmodule Exexec.Mixfile do
     [
       {:erlexec, "~> 1.7"},
       {:dialyxir, "~> 0.3", only: [:dev, :test]},
+      {:ex_doc, "~> 0.11", only: :dev},
       {:excoveralls, "~> 0.6.2", only: :test},
       {:inch_ex, ">= 0.0.0", only: :docs}
     ]
