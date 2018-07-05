@@ -44,7 +44,7 @@ defmodule Exexec do
     {:kill_command, String.t} |
     {:kill_timeout, non_neg_integer} |
     {:kill_group, boolean} |
-    {:group, String.t} |
+    {:group, non_neg_integer | String.t} |
     {:user, String.t} |
     {:success_exit_code, exit_code} |
     {:nice, -20..20} |
