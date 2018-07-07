@@ -2,6 +2,7 @@ defmodule ExexecTest do
   use ExUnit.Case
 
   import Exexec
+  require Logger
 
   setup do
     {:ok, pid} = Exexec.start()
@@ -18,11 +19,11 @@ defmodule ExexecTest do
   end
 
   test "kill" do
-    {:ok, _sleep_pid, sleep_os_pid} = run("sleep 10", monitor: true)
+    {:ok, sleep_pid, sleep_os_pid} = run("sleep 10", monitor: true)
 
     assert :ok = kill(sleep_os_pid, 9)
 
-    assert_receive {:DOWN, _, :process, sleep_pid, {:exit_status, 9}}
+    assert_receive {:DOWN, _, :process, ^sleep_pid, {:exit_status, 9}}
   end
 
   test "manage" do
@@ -99,6 +100,7 @@ defmodule ExexecTest do
     assert_receive {:stdout, ^cat_os_pid, "hi2\n"}
   end
 
+  @tag :capture_log
   test "set_gid" do
     Process.flag(:trap_exit, true)
 
@@ -107,7 +109,8 @@ defmodule ExexecTest do
     try do
       set_gid(sleep_os_pid, 123123)
     catch
-      :exit, reason -> assert reason == {{:exit_status, 139}, {:gen_server, :call, [:exec, {:port, {:setpgid, sleep_os_pid, 123123}}]}}
+      :exit, reason ->
+        assert reason == {{:exit_status, 139}, {:gen_server, :call, [:exec, {:port, {:setpgid, sleep_os_pid, 123123}}]}}
     end
   end
 
@@ -144,6 +147,6 @@ defmodule ExexecTest do
   test "which_children" do
     {:ok, _sleep_pid, sleep_os_pid} = run_link("sleep 10")
 
-    assert which_children == [sleep_os_pid]
+    assert which_children() == [sleep_os_pid]
   end
 end

@@ -1,13 +1,13 @@
 defmodule Exexec.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
       app: :exexec,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.6",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps(),
@@ -34,11 +34,11 @@ defmodule Exexec.Mixfile do
 
   defp deps do
     [
-      {:erlexec, "~> 1.7"},
-      {:dialyxir, "~> 0.3", only: [:dev, :test]},
-      {:earmark, "~> 0.1", only: :dev},
-      {:ex_doc, "~> 0.11", only: :dev},
-      {:excoveralls, "~> 0.6.2", only: :test},
+      {:erlexec, "~> 1.0"},
+      {:dialyxir, "1.0.0-rc.2 or ~> 1.0", only: [:dev, :test]},
+      {:earmark, "~> 1.2", only: :dev},
+      {:ex_doc, "~> 0.18", only: :dev},
+      {:excoveralls, "~> 0.9", only: :test},
       {:inch_ex, ">= 0.0.0", only: :docs}
     ]
   end
