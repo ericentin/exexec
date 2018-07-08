@@ -10,14 +10,11 @@ interface as well as some nice Elixir-y goodies on top.
 
 ## Installation
 
-  1. Add exexec to your list of dependencies in `mix.exs`:
+Add exexec to your list of dependencies in `mix.exs`:
+```
+  def deps do
+    [{:exexec, "~> 0.2"}]
+  end
+```
 
-        def deps do
-          [{:exexec, "~> 0.1"}]
-        end
-
-  2. Ensure exexec and erlexec are started before your application:
-
-        def application do
-          [applications: [:erlexec, :exexec]]
-        end
+**NOTE:** version `0.2` is compatible with OTP 21 and upwards. Use `0.1` for earlier OTP versions.
