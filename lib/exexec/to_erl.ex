@@ -39,8 +39,8 @@ defmodule Exexec.ToErl do
   def command_option_to_erl(:group, value) do
     {:group,
      case value do
-       integer when is_integer(value) -> value
-       string -> to_charlist(value)
+       value when is_integer(value) -> value
+       value -> to_charlist(value)
      end}
   end
 
