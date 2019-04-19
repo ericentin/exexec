@@ -9,68 +9,69 @@ defmodule Exexec do
 
   import Exexec.ToErl
 
-  @type command :: String.t | [Path.t | [String.t]]
+  @type command :: String.t() | [Path.t() | [String.t()]]
 
   @type os_pid :: non_neg_integer
 
   @type gid :: non_neg_integer
 
   @type output_file_option ::
-    {:append, boolean} |
-    {:mode, non_neg_integer}
+          {:append, boolean}
+          | {:mode, non_neg_integer}
 
   @type output_device :: :stdout | :stderr
 
   @type output_file_options :: [output_file_option]
 
   @type output_device_option ::
-    boolean |
-    :null |
-    :close |
-    :print |
-    Path.t |
-    {Path.t, output_file_options} |
-    pid |
-    (output_device, os_pid, binary -> any)
+          boolean
+          | :null
+          | :close
+          | :print
+          | Path.t()
+          | {Path.t(), output_file_options}
+          | pid
+          | (output_device, os_pid, binary -> any)
 
   @type command_option ::
-    {:monitor, boolean} |
-    {:sync, boolean} |
-    {:executable, Path.t} |
-    {:cd, Path.t} |
-    {:env, %{String.t => String.t}} |
-    {:kill_command, String.t} |
-    {:kill_timeout, non_neg_integer} |
-    {:kill_group, boolean} |
-    {:group, String.t} |
-    {:user, String.t} |
-    {:success_exit_code, exit_code} |
-    {:nice, -20..20} |
-    {:stdin, boolean | :null | :close | Path.t} |
-    {:stdout, :stderr | output_device_option} |
-    {:stderr, :stdout | output_device_option} |
-    {:pty, boolean}
+          {:monitor, boolean}
+          | {:sync, boolean}
+          | {:executable, Path.t()}
+          | {:cd, Path.t()}
+          | {:env, %{String.t() => String.t()}}
+          | {:kill_command, String.t()}
+          | {:kill_timeout, non_neg_integer}
+          | {:kill_group, boolean}
+          | {:group, String.t()}
+          | {:user, String.t()}
+          | {:success_exit_code, exit_code}
+          | {:nice, -20..20}
+          | {:stdin, boolean | :null | :close | Path.t()}
+          | {:stdout, :stderr | output_device_option}
+          | {:stderr, :stdout | output_device_option}
+          | {:pty, boolean}
 
   @type command_options :: [command_option]
 
   @type exec_option ::
-    {:debug, boolean | non_neg_integer} |
-    {:verbose, boolean} |
-    {:args, [String.t]} |
-    {:alarm, non_neg_integer} |
-    {:user, String.t} |
-    {:limit_users, [String.t]} |
-    {:port_path, Path.t} |
-    {:env, %{String.t => String.t}}
+          {:debug, boolean | non_neg_integer}
+          | {:root, boolean}
+          | {:verbose, boolean}
+          | {:args, [String.t()]}
+          | {:alarm, non_neg_integer}
+          | {:user, String.t()}
+          | {:limit_users, [String.t()]}
+          | {:port_path, Path.t()}
+          | {:env, %{String.t() => String.t()}}
 
   @type exec_options :: [exec_option]
 
   @type signal :: pos_integer
 
   @type on_run ::
-    {:ok, pid, os_pid} |
-    {:ok, [{output_device, [binary]}]} |
-    {:error, any}
+          {:ok, pid, os_pid}
+          | {:ok, [{output_device, [binary]}]}
+          | {:error, any}
 
   @type exit_code :: non_neg_integer
 
@@ -171,7 +172,9 @@ defmodule Exexec do
   Start `Exexec` with `options`.
   """
   @spec start(exec_options) :: {:ok, pid} | {:error, any}
-  defdelegate start(options), to: :exec
+  def start(options) do
+    :exec.start(exec_options_to_erl(options))
+  end
 
   @doc """
   Start `Exexec` and link to calling process.
@@ -183,7 +186,9 @@ defmodule Exexec do
   Start `Exexec` with `options` and link to calling process.
   """
   @spec start_link(exec_options) :: {:ok, pid} | {:error, any}
-  defdelegate start_link(options), to: :exec
+  def start_link(options) do
+    :exec.start_link(exec_options_to_erl(options))
+  end
 
   @doc """
   Interpret `exit_code`.

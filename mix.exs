@@ -1,45 +1,36 @@
-defmodule Exexec.Mixfile do
+defmodule Exexec.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
       app: :exexec,
       version: @version,
-      elixir: "~> 1.2",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
-      deps: deps(),
-      description: description(),
-      package: package(),
-      dialyzer: [
-        plt_add_deps: :project,
-        plt_add_apps: [:erlexec],
-      ],
-      source_url: "https://github.com/antipax/exexec",
+      elixir: "~> 1.8",
+      start_permanent: Mix.env() == :prod,
+      source_url: "https://github.com/ericentin/exexec",
       docs: [
         main: "Exexec",
         extras: ["README.md"],
         source_ref: "v#{@version}"
       ],
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
+      deps: deps(),
+      description: description(),
+      package: package()
     ]
   end
 
   def application do
-    [included_applications: [:erlexec]]
+    [
+      extra_applications: [:logger]
+    ]
   end
 
   defp deps do
     [
-      {:erlexec, "~> 1.7"},
-      {:dialyxir, "~> 0.3", only: [:dev, :test]},
-      {:earmark, "~> 0.1", only: :dev},
-      {:ex_doc, "~> 0.11", only: :dev},
-      {:excoveralls, "~> 0.6.2", only: :test},
-      {:inch_ex, ">= 0.0.0", only: :docs}
+      {:erlexec, "~> 1.10"},
+      {:ex_doc, "~> 0.20", only: :dev}
     ]
   end
 
@@ -50,10 +41,9 @@ defmodule Exexec.Mixfile do
   defp package do
     [
       files: ["lib", "mix.exs", "README.md", "LICENSE"],
-      maintainers: ["Eric Entin"],
       licenses: ["Apache 2.0"],
       links: %{
-        "GitHub" => "https://github.com/antipax/exexec"
+        "GitHub" => "https://github.com/ericentin/exexec"
       }
     ]
   end

@@ -2,20 +2,7 @@ defmodule ExexecTest do
   use ExUnit.Case
 
   import Exexec
-
-  setup do
-    {:ok, pid} = Exexec.start()
-
-    on_exit fn ->
-      try do
-        GenServer.stop(pid, :shutdown)
-      catch
-        _, _ -> :ok
-      end
-    end
-
-    :ok
-  end
+  import ExUnit.CaptureLog
 
   test "kill" do
     {:ok, _sleep_pid, sleep_os_pid} = run("sleep 10", monitor: true)
@@ -27,7 +14,7 @@ defmodule ExexecTest do
 
   test "manage" do
     bash = System.find_executable("bash")
-    {:ok, _spawner_pid, spawner_os_pid} = run([bash, "-c" ,"sleep 100 & echo $!"], stdout: true)
+    {:ok, _spawner_pid, spawner_os_pid} = run([bash, "-c", "sleep 100 & echo $!"], stdout: true)
 
     sleep_os_pid =
       receive do
@@ -55,11 +42,12 @@ defmodule ExexecTest do
 
     assert os_pid(sleep_pid) == {:ok, sleep_os_pid}
 
-    {:ok, pid} = Task.start_link fn ->
-      receive do
-        {{pid, ref}, :ospid} -> Kernel.send pid, {ref, {:error, :testing}}
-      end
-    end
+    {:ok, pid} =
+      Task.start_link(fn ->
+        receive do
+          {{pid, ref}, :ospid} -> Kernel.send(pid, {ref, {:error, :testing}})
+        end
+      end)
 
     assert os_pid(pid) == {:error, :testing}
   end
@@ -69,7 +57,7 @@ defmodule ExexecTest do
 
     assert pid(sleep_os_pid) == {:ok, sleep_pid}
 
-    assert pid(123411231231) == {:error, :undefined}
+    assert pid(123_411_231_231) == {:error, :undefined}
   end
 
   test "run" do
@@ -104,11 +92,16 @@ defmodule ExexecTest do
 
     {:ok, _sleep_pid, sleep_os_pid} = run_link("sleep 100")
 
-    try do
-      set_gid(sleep_os_pid, 123123)
-    catch
-      :exit, reason -> assert reason == {{:exit_status, 139}, {:gen_server, :call, [:exec, {:port, {:setpgid, sleep_os_pid, 123123}}]}}
-    end
+    capture_log(fn ->
+      try do
+        set_gid(sleep_os_pid, 123_123)
+      catch
+        :exit, reason ->
+          assert reason ==
+                   {{:exit_status, 139},
+                    {:gen_server, :call, [:exec, {:port, {:setpgid, sleep_os_pid, 123_123}}]}}
+      end
+    end)
   end
 
   test "status" do
@@ -144,6 +137,6 @@ defmodule ExexecTest do
   test "which_children" do
     {:ok, _sleep_pid, sleep_os_pid} = run_link("sleep 10")
 
-    assert which_children == [sleep_os_pid]
+    assert sleep_os_pid in which_children()
   end
 end
