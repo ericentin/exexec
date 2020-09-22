@@ -8,6 +8,7 @@ defmodule Exexec do
   """
 
   import Exexec.ToErl
+  import Kernel, except: [send: 2]
 
   @type command :: String.t() | [Path.t() | [String.t()]]
 
@@ -31,6 +32,7 @@ defmodule Exexec do
           | Path.t()
           | {Path.t(), output_file_options}
           | pid
+          | :stream
           | (output_device, os_pid, binary -> any)
 
   @type command_option ::
@@ -71,6 +73,7 @@ defmodule Exexec do
   @type on_run ::
           {:ok, pid, os_pid}
           | {:ok, [{output_device, [binary]}]}
+          | {:ok, pid, os_pid, [{:stream, Enumerable.t(), pid}]}
           | {:error, any}
 
   @type exit_code :: non_neg_integer
@@ -122,10 +125,7 @@ defmodule Exexec do
   @spec run(command) :: on_run
   @spec run(command, command_options) :: on_run
   def run(command, options \\ []) do
-    command = command_to_erl(command)
-    options = command_options_to_erl(options)
-
-    :exec.run(command, options)
+    prepare_run_exec(:run, command, options)
   end
 
   @doc """
@@ -136,10 +136,7 @@ defmodule Exexec do
   @spec run_link(command) :: on_run
   @spec run_link(command, command_options) :: on_run
   def run_link(command, options \\ []) do
-    command = command_to_erl(command)
-    options = command_options_to_erl(options)
-
-    :exec.run_link(command, options)
+    prepare_run_exec(:run_link, command, options)
   end
 
   @doc """
@@ -225,4 +222,42 @@ defmodule Exexec do
   """
   @spec which_children() :: [os_pid]
   defdelegate which_children(), to: :exec
+
+  defp handle_extras([{:stdout, :stream}]) do
+    {:ok, stream, server} = Exexec.StreamOutput.create_line_stream()
+    {:ok, [{:stdout, server}], [{:stream, stream, server}]}
+  end
+
+  defp handle_extras(_) do
+    {:ok, [], []}
+  end
+
+  defp prepare_run_exec(type, command, options) do
+    with :ok <- Exexec.Extras.validate(options) do
+      command = command_to_erl(command)
+      {extras, options} = Exexec.Extras.split(options)
+      {:ok, additional_options, stream} = handle_extras(extras)
+      options = command_options_to_erl(options)
+
+      case {run_exec(type, command, options ++ additional_options), stream} do
+        {result, []} ->
+          result
+
+        {{:ok, pid, os_pid}, [{:stream, stream, server_pid}]} ->
+          Kernel.send(server_pid, {:monitor, pid})
+          {:ok, pid, os_pid, [{:stream, stream, server_pid}]}
+      end
+    else
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  defp run_exec(:run, command, options) do
+    :exec.run(command, options)
+  end
+
+  defp run_exec(:run_link, command, options) do
+    :exec.run_link(command, options)
+  end
 end

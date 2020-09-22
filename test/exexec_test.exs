@@ -5,11 +5,11 @@ defmodule ExexecTest do
   import ExUnit.CaptureLog
 
   test "kill" do
-    {:ok, _sleep_pid, sleep_os_pid} = run("sleep 10", monitor: true)
+    {:ok, sleep_pid, sleep_os_pid} = run("sleep 10", monitor: true)
 
     assert :ok = kill(sleep_os_pid, 9)
 
-    assert_receive {:DOWN, _, :process, sleep_pid, {:exit_status, 9}}
+    assert_receive {:DOWN, _, :process, ^sleep_pid, {:exit_status, 9}}
   end
 
   test "manage" do
@@ -110,6 +110,28 @@ defmodule ExexecTest do
     assert status(0) == {:status, 0}
   end
 
+  test "can pull n elements from stream" do
+    cmd = "for i in 1 2 3; do sleep 0.001; echo \"Iter$i\"; done"
+    assert {:ok, _pid, _, [{:stream, stream, _server}]} = Exexec.run(cmd, [{:stdout, :stream}])
+    assert 2 == length(Enum.take(stream, 2))
+  end
+
+  test "can pull just as many elements from stream as is" do
+    cmd = "for i in 1 2 3; do sleep 0.001; echo \"Iter$i\"; done"
+    assert {:ok, _pid, _, [{:stream, stream, _server}]} = Exexec.run(cmd, [{:stdout, :stream}])
+    assert contains?(stream, "Iter3\n")
+  end
+
+  test "can close stream server without reading all the items" do
+    cmd = "for i in 1 2 3; do sleep 0.001; echo \"Iter$i\"; done"
+    assert {:ok, _pid, _, [{:stream, stream, server}]} = Exexec.run(cmd, [{:stdout, :stream}])
+    Enum.take(stream, 1)
+    assert Process.alive?(server)
+    Exexec.StreamOutput.stop(server)
+    Process.sleep(100)
+    assert not Process.alive?(server)
+  end
+
   # test "stop" do
   #   {:ok, sleep_pid, sleep_os_pid} = run_link("sleep 10")
   #
@@ -138,5 +160,16 @@ defmodule ExexecTest do
     {:ok, _sleep_pid, sleep_os_pid} = run_link("sleep 10")
 
     assert sleep_os_pid in which_children()
+  end
+
+  defp contains?(stream, look_for) do
+    finder = fn line, _ ->
+      case String.contains?(line, look_for) do
+        true -> {:halt, true}
+        false -> {false, false}
+      end
+    end
+
+    Stream.transform(stream, false, finder)
   end
 end

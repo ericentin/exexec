@@ -63,6 +63,9 @@ defmodule Exexec.ToErl do
       false ->
         nil
 
+      :stream ->
+        {output_device_option, :stream}
+
       ^other_option ->
         {output_device_option, other_option}
 
