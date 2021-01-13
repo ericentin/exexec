@@ -1,6 +1,7 @@
 defmodule Exexec.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/ericentin/exexec"
   @version "0.2.0"
 
   def project do
@@ -9,10 +10,10 @@ defmodule Exexec.MixProject do
       version: @version,
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
-      source_url: "https://github.com/ericentin/exexec",
       docs: [
-        main: "Exexec",
+        main: "readme",
         extras: ["README.md"],
+        source_url: @source_url,
         source_ref: "v#{@version}"
       ],
       deps: deps(),
@@ -30,7 +31,7 @@ defmodule Exexec.MixProject do
   defp deps do
     [
       {:erlexec, "~> 1.10"},
-      {:ex_doc, "~> 0.20", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
@@ -41,9 +42,10 @@ defmodule Exexec.MixProject do
   defp package do
     [
       files: ["lib", "mix.exs", "README.md", "LICENSE"],
-      licenses: ["Apache 2.0"],
+      maintainers: ["Eric Entin"],
+      licenses: ["Apache-2.0"],
       links: %{
-        "GitHub" => "https://github.com/ericentin/exexec"
+        "GitHub" => @source_url
       }
     ]
   end
